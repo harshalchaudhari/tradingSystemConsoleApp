@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using tradeSystemConsoleApplication;
 using tradeSystemConsoleApplication.DataContract;
+using tradeSystemConsoleApplication.NotificationManager;
 using System.Diagnostics.Tracing;
 using System.Diagnostics;
 
@@ -18,18 +19,20 @@ namespace StockMarket
         public int MinimumVolumeTradedInDayThreshold { get; private set; }
         public IEnumerable<string> ConcatenatedTickers { get; private set; }
         public double TriggerThreshold { get; private set; }
+        public string Recepients { get; private set; }
 
         //TODO: Fix the hard coded values
-        public StockObserver(IEnumerable<string> concatenatedTickers, double triggerThreshold) : this(concatenatedTickers, triggerThreshold, 5, 100000)
+        public StockObserver(IEnumerable<string> concatenatedTickers, double triggerThreshold) : this(concatenatedTickers, string.Empty, triggerThreshold, 5, 100000)
         { }
 
-        public StockObserver(IEnumerable<string> concatenatedTickers, double triggerThreshold, int maximumCachedValues, int minimumVolumeTradedInDayThreshold)
+        public StockObserver(IEnumerable<string> concatenatedTickers, string concatenatedRecepients, double triggerThreshold, int maximumCachedValues, int minimumVolumeTradedInDayThreshold)
         {
             cachedValues = new Queue<Dictionary<string, Fields>>();
             MaximumCachedValues = maximumCachedValues;
             MinimumVolumeTradedInDayThreshold = minimumVolumeTradedInDayThreshold;
             ConcatenatedTickers = concatenatedTickers;
             TriggerThreshold = triggerThreshold;
+            Recepients = concatenatedRecepients;
         }
 
         public List<KeyValuePair<string, double>> GetInterestingStocks(Dictionary<string, Fields> oldestStockQuotes, Dictionary<string, Fields> latestStockQuotes)
@@ -52,8 +55,8 @@ namespace StockMarket
 
                 if (interestingStocks.Count > 0)
                 {
-                    //TODO: TryNotify
-                    
+                    string body = ConstructEmailContent(interestingStocks);
+                    EmailManager.sendEmailAlert(body, Recepients, true);
                 }
 
                 if (cachedValues.Count >= MaximumCachedValues)
@@ -97,9 +100,24 @@ namespace StockMarket
             return difference;
         }
 
-        public static string ConstructEmailContent(Dictionary<string, double> stockDifferences)
+        public static string ConstructEmailContent(List<KeyValuePair<string, double>> stockDifferences)
         {
-            return string.Empty;
+            StringBuilder htmlBodyContent = new StringBuilder();
+
+            htmlBodyContent.Append("<HTML>");
+            htmlBodyContent.Append("<Body>");
+            htmlBodyContent.Append("<Table border=1>");
+            htmlBodyContent.Append("<TR><TH>Symbol</TH><TH>Price Difference in %</TH></TR>");
+            foreach (KeyValuePair<string, double> stockDifference in stockDifferences)
+            {
+                htmlBodyContent.Append(string.Format("<TR><TD>{0}</TD>{1}</TR>", stockDifference.Key, stockDifference.Value));
+            }
+
+            htmlBodyContent.Append("</Table>");
+            htmlBodyContent.Append("</Body>");
+            htmlBodyContent.Append("</HTML>");
+
+            return htmlBodyContent.ToString();
         }
     }
 }

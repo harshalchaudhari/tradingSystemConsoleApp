@@ -15,7 +15,7 @@ namespace TradeSystemConsoleApplication.UnitTests
         [TestMethod]
         public void SendEmailAlerts_ValidData_Success()
         {
-            string message = @"<html><body><table><li>Kunal</li><li>Harshal</li><li>Rushabh</li><li>Rahul</li><li>Ramchandra</li></table></body></html>";
+            string message = @"<html><body><table border=1><li>Kunal</li><li>Harshal</li><li>Rushabh</li><li>Rahul</li><li>Ramchandra</li></table></body></html>";
             string recepients = "kp101090@gmail.com";
 
             EmailManager.sendEmailAlert(message, recepients, true);

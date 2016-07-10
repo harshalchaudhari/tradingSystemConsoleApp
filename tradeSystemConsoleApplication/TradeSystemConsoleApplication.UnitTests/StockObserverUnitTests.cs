@@ -13,9 +13,9 @@ namespace TradeSystemConsoleApplication.UnitTests
         public void TestMethod1()
         {
             IEnumerable<string> tickers = TickerHelper.GetTickers(@"C:\StockData\SymbolsTop100.csv", new char[]{'\n', '\r'});
-            StockObserver stockObserver = new StockObserver(tickers, 10.0);
+            StockObserver stockObserver = new StockObserver(tickers, "kp101090@gmail.com", 0.0, 5, 1);
 
-            for (int i=0; i<15;i++)
+            for (int i=0; i<2;i++)
             {
                 stockObserver.Observe();
                 Thread.Sleep(5000);
