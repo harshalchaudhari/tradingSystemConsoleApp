@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tradeSystemConsoleApplication", "tradeSystemConsoleApplication\tradeSystemConsoleApplication.csproj", "{9F98BEF9-ECDD-4695-AA6C-3222A007998D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeSystemConsoleApplication.UnitTests", "TradeSystemConsoleApplication.UnitTests\TradeSystemConsoleApplication.UnitTests.csproj", "{3EAD0D71-B16A-428A-9867-F00FD29E953E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{9F98BEF9-ECDD-4695-AA6C-3222A007998D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F98BEF9-ECDD-4695-AA6C-3222A007998D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F98BEF9-ECDD-4695-AA6C-3222A007998D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EAD0D71-B16A-428A-9867-F00FD29E953E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EAD0D71-B16A-428A-9867-F00FD29E953E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EAD0D71-B16A-428A-9867-F00FD29E953E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EAD0D71-B16A-428A-9867-F00FD29E953E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
