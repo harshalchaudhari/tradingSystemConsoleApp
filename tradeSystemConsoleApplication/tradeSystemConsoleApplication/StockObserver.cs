@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using tradeSystemConsoleApplication;
 using tradeSystemConsoleApplication.DataContract;
+using System.Diagnostics.Tracing;
+using System.Diagnostics;
 
 namespace StockMarket
 {
@@ -14,14 +16,14 @@ namespace StockMarket
 
         public int MaximumCachedValues { get; private set; }
         public int MinimumVolumeTradedInDayThreshold { get; private set; }
-        public List<string> ConcatenatedTickers { get; private set; }
+        public IEnumerable<string> ConcatenatedTickers { get; private set; }
         public double TriggerThreshold { get; private set; }
 
         //TODO: Fix the hard coded values
-        public StockObserver(List<string> concatenatedTickers, double triggerThreshold) : this(concatenatedTickers, triggerThreshold, 5, 100000)
+        public StockObserver(IEnumerable<string> concatenatedTickers, double triggerThreshold) : this(concatenatedTickers, triggerThreshold, 5, 100000)
         { }
 
-        public StockObserver(List<string> concatenatedTickers, double triggerThreshold, int maximumCachedValues, int minimumVolumeTradedInDayThreshold)
+        public StockObserver(IEnumerable<string> concatenatedTickers, double triggerThreshold, int maximumCachedValues, int minimumVolumeTradedInDayThreshold)
         {
             cachedValues = new Queue<Dictionary<string, Fields>>();
             MaximumCachedValues = maximumCachedValues;
@@ -30,11 +32,43 @@ namespace StockMarket
             TriggerThreshold = triggerThreshold;
         }
 
-        public Dictionary<string, Fields> GetLatestStockActivity()
+        public List<KeyValuePair<string, double>> GetInterestingStocks(Dictionary<string, Fields> oldestStockQuotes, Dictionary<string, Fields> latestStockQuotes)
+        {
+            Dictionary<string, double> difference = GetDifference(oldestStockQuotes, latestStockQuotes);
+
+            return difference.Where(stock => stock.Value >= TriggerThreshold
+                                             && Int32.Parse(latestStockQuotes[stock.Key].volume) >= MinimumVolumeTradedInDayThreshold).ToList();
+        }
+
+        public void Observe()
+        {
+            Dictionary<string, Fields> latestStockQuotes = GetLatestStockActivity(ConcatenatedTickers);
+
+            if (cachedValues.Count != 0)
+            {
+                Dictionary<string, Fields> oldestStockQuotes = cachedValues.Peek();
+                
+                List<KeyValuePair<string, double>> interestingStocks = GetInterestingStocks(oldestStockQuotes, latestStockQuotes);
+
+                if (interestingStocks.Count > 0)
+                {
+                    //TODO: TryNotify
+                    
+                }
+
+                if (cachedValues.Count >= MaximumCachedValues)
+                {
+                    cachedValues.Dequeue();
+                }
+            }
+            cachedValues.Enqueue(latestStockQuotes);
+        }
+
+        public static Dictionary<string, Fields> GetLatestStockActivity(IEnumerable<string> concatenatedTickers)
         {
             Dictionary<string, Fields> latestStockQuotes = new Dictionary<string, Fields>();
 
-            foreach (string concatenatedTicker in ConcatenatedTickers)
+            foreach (string concatenatedTicker in concatenatedTickers)
             {
                 var dictionary = YahooApi.yahooGetQuotes(concatenatedTicker);
 
@@ -47,7 +81,7 @@ namespace StockMarket
             return latestStockQuotes;
         }
 
-        public Dictionary<string, double> GetDifference(Dictionary<string, Fields> oldestStockQuotes, Dictionary<string, Fields> latestStockQuotes)
+        public static Dictionary<string, double> GetDifference(Dictionary<string, Fields> oldestStockQuotes, Dictionary<string, Fields> latestStockQuotes)
         {
             Dictionary<string, double> difference = new Dictionary<string, double>();
 
@@ -63,35 +97,9 @@ namespace StockMarket
             return difference;
         }
 
-        public List<KeyValuePair<string, double>> GetInterestingStocks(Dictionary<string, Fields> oldestStockQuotes, Dictionary<string, Fields> latestStockQuotes)
+        public static string ConstructEmailContent(Dictionary<string, double> stockDifferences)
         {
-            Dictionary<string, double> difference = GetDifference(oldestStockQuotes, latestStockQuotes);
-
-            return difference.Where(stock => stock.Value >= TriggerThreshold
-                                             && Int32.Parse(latestStockQuotes[stock.Key].volume) >= MinimumVolumeTradedInDayThreshold).ToList();
-        }
-
-        public void Observe()
-        {
-            Dictionary<string, Fields> latestStockQuotes = GetLatestStockActivity();
-
-            if (cachedValues.Count != 0)
-            {
-                Dictionary<string, Fields> oldestStockQuotes = cachedValues.Peek();
-                
-                List<KeyValuePair<string, double>> interestingStocks = GetInterestingStocks(oldestStockQuotes, latestStockQuotes);
-
-                if (interestingStocks.Count > 0)
-                {
-                    //TODO: TryNotify
-                }
-
-                if (cachedValues.Count >= MaximumCachedValues)
-                {
-                    cachedValues.Dequeue();
-                }
-            }
-            cachedValues.Enqueue(latestStockQuotes);
+            return string.Empty;
         }
     }
 }

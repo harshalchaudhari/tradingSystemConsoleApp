@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace tradeSystemConsoleApplication.NotificationManager
 {
-    class EmailManager
+    public class EmailManager
     {
-        public static string sendEmailAlert(string messageContent, string toEmailAddresses)
+        public static string sendEmailAlert(string messageContent, string toEmailAddresses, bool isBodyHtml = false)
         {
             MailMessage msg = new MailMessage();
 
@@ -21,6 +21,7 @@ namespace tradeSystemConsoleApplication.NotificationManager
             }
             msg.Subject = "TradeSystem notification:" + DateTime.Now.ToString();
             msg.Body = messageContent;
+            msg.IsBodyHtml = isBodyHtml;
             SmtpClient client = new SmtpClient();
             client.UseDefaultCredentials = true;
             client.Host = "smtp.gmail.com";
