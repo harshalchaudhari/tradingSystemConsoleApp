@@ -52,6 +52,7 @@
     <Compile Include="NotificationManager\SmsManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RollingFileTraceListener.cs" />
     <Compile Include="StockObserver.cs" />
     <Compile Include="TickerHelper.cs" />
     <Compile Include="YahooApi.cs" />

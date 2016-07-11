@@ -21,11 +21,12 @@ namespace StockMarket
         public double TriggerThreshold { get; private set; }
         public string Recepients { get; private set; }
 
-        //TODO: Fix the hard coded values
-        public StockObserver(IEnumerable<string> concatenatedTickers, double triggerThreshold) : this(concatenatedTickers, string.Empty, triggerThreshold, 5, 100000)
-        { }
-
-        public StockObserver(IEnumerable<string> concatenatedTickers, string concatenatedRecepients, double triggerThreshold, int maximumCachedValues, int minimumVolumeTradedInDayThreshold)
+        public StockObserver(
+            IEnumerable<string> concatenatedTickers, 
+            string concatenatedRecepients, 
+            double triggerThreshold, 
+            int maximumCachedValues, 
+            int minimumVolumeTradedInDayThreshold)
         {
             cachedValues = new Queue<Dictionary<string, Fields>>();
             MaximumCachedValues = maximumCachedValues;
@@ -45,18 +46,19 @@ namespace StockMarket
 
         public void Observe()
         {
+            Trace.TraceInformation("Getting latest stock information...");
             Dictionary<string, Fields> latestStockQuotes = GetLatestStockActivity(ConcatenatedTickers);
 
             if (cachedValues.Count != 0)
             {
                 Dictionary<string, Fields> oldestStockQuotes = cachedValues.Peek();
-                
+
+                Trace.TraceInformation("Comparing oldest stock quotes with latest stock quotes");
                 List<KeyValuePair<string, double>> interestingStocks = GetInterestingStocks(oldestStockQuotes, latestStockQuotes);
 
                 if (interestingStocks.Count > 0)
                 {
-                    string body = ConstructEmailContent(interestingStocks);
-                    EmailManager.SendEmail(body, Recepients, true);
+                    Notify(interestingStocks, Recepients);
                 }
 
                 if (cachedValues.Count >= MaximumCachedValues)
@@ -100,7 +102,7 @@ namespace StockMarket
             return difference;
         }
 
-        public static string ConstructEmailContent(List<KeyValuePair<string, double>> stockDifferences)
+        public static string ConstructEmailContent(List<KeyValuePair<string, double>> stockDifference)
         {
             StringBuilder htmlBodyContent = new StringBuilder();
 
@@ -109,9 +111,9 @@ namespace StockMarket
             htmlBodyContent.Append("<Table border=1>");
             htmlBodyContent.Append("<TR><TH>Symbol</TH><TH>Price Difference in %</TH></TR>");
 
-            foreach (KeyValuePair<string, double> stockDifference in stockDifferences)
+            foreach (KeyValuePair<string, double> currentDifference in stockDifference)
             {
-                htmlBodyContent.Append(string.Format("<TR><TD>{0}</TD>{1}</TR>", stockDifference.Key, stockDifference.Value));
+                htmlBodyContent.Append(string.Format("<TR><TD>{0}</TD>{1}</TR>", currentDifference.Key, currentDifference.Value));
             }
 
             htmlBodyContent.Append("</Table>");
@@ -119,6 +121,25 @@ namespace StockMarket
             htmlBodyContent.Append("</HTML>");
 
             return htmlBodyContent.ToString();
+        }
+
+        public static void Notify(List<KeyValuePair<string, double>> stockDifference, string concatenatedRecepients)
+        {
+            Trace.TraceInformation("{0} stocks exceeded given threshold!!", stockDifference.Count);
+            Trace.TraceInformation("Time to notify: {0}", DateTime.Now);
+            
+            string body = ConstructEmailContent(stockDifference);
+            Trace.TraceInformation("Content: {0}", body);
+
+            try
+            {
+                EmailManager.SendEmail(body, concatenatedRecepients, true);
+            }
+            catch (Exception exception)
+            {
+                Trace.TraceError("Ran into exception while sending email! Error: {0}", exception);
+            }
+            
         }
     }
 }
