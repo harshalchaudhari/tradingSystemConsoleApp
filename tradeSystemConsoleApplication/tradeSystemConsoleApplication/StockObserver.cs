@@ -56,7 +56,7 @@ namespace StockMarket
                 if (interestingStocks.Count > 0)
                 {
                     string body = ConstructEmailContent(interestingStocks);
-                    EmailManager.sendEmailAlert(body, Recepients, true);
+                    EmailManager.SendEmail(body, Recepients, true);
                 }
 
                 if (cachedValues.Count >= MaximumCachedValues)
@@ -108,6 +108,7 @@ namespace StockMarket
             htmlBodyContent.Append("<Body>");
             htmlBodyContent.Append("<Table border=1>");
             htmlBodyContent.Append("<TR><TH>Symbol</TH><TH>Price Difference in %</TH></TR>");
+
             foreach (KeyValuePair<string, double> stockDifference in stockDifferences)
             {
                 htmlBodyContent.Append(string.Format("<TR><TD>{0}</TD>{1}</TR>", stockDifference.Key, stockDifference.Value));

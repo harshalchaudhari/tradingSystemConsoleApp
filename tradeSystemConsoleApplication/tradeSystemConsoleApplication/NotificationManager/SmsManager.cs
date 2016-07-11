@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace tradeSystemConsoleApplication.NotificationManager
 {
-    class SmsManager
+    public class SmsManager
     {
     }
 }

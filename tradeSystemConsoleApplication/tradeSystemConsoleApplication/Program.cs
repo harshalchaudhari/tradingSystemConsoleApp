@@ -14,7 +14,7 @@ namespace tradeSystemConsoleApplication
         {
             Dictionary<string, Fields> dict = YahooApi.yahooGetQuotes("AAPL,YHOO",true);
             Dictionary<string, Fields> dict1 = YahooApi.yahooGetQuotes("AAPL,YHOO");
-            Console.WriteLine(EmailManager.sendEmailAlert("This means emailNotificationManager is working in tradeSystm","harshal420@gmail.com;rushabhmehta05@gmail.com;kp101090@gmail.com"));
+            //Console.WriteLine(EmailManager.SendEmailAlert("This means emailNotificationManager is working in tradeSystm","harshal420@gmail.com;rushabhmehta05@gmail.com;kp101090@gmail.com"));
             //Implement log to log emails sent, triggers etc
         }
     }
