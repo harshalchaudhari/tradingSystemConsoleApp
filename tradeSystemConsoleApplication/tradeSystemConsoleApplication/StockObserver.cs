@@ -85,8 +85,28 @@ namespace StockMarket
 
             return latestStockQuotes;
         }
+        
+        // TODO: In future, this call should go to External Notification System
+        public static void Notify(List<KeyValuePair<string, double>> stockDifference, string concatenatedRecepients)
+        {
+            Trace.TraceInformation("{0} stocks exceeded given threshold!!", stockDifference.Count);
+            Trace.TraceInformation("Time to notify: {0}", DateTime.Now);
+            
+            string body = ConstructEmailContent(stockDifference);
+            Trace.TraceInformation("Content: {0}", body);
 
-        public static Dictionary<string, double> GetDifference(Dictionary<string, Fields> oldestStockQuotes, Dictionary<string, Fields> latestStockQuotes)
+            try
+            {
+                EmailManager.SendEmail(body, concatenatedRecepients, true);
+            }
+            catch (Exception exception)
+            {
+                Trace.TraceError("Ran into exception while sending email! Error: {0}", exception);
+            }    
+        }
+
+        #region Helper Methods
+        private static Dictionary<string, double> GetDifference(Dictionary<string, Fields> oldestStockQuotes, Dictionary<string, Fields> latestStockQuotes)
         {
             Dictionary<string, double> difference = new Dictionary<string, double>();
 
@@ -102,7 +122,7 @@ namespace StockMarket
             return difference;
         }
 
-        public static string ConstructEmailContent(List<KeyValuePair<string, double>> stockDifference)
+        private static string ConstructEmailContent(List<KeyValuePair<string, double>> stockDifference)
         {
             StringBuilder htmlBodyContent = new StringBuilder();
 
@@ -122,24 +142,6 @@ namespace StockMarket
 
             return htmlBodyContent.ToString();
         }
-
-        public static void Notify(List<KeyValuePair<string, double>> stockDifference, string concatenatedRecepients)
-        {
-            Trace.TraceInformation("{0} stocks exceeded given threshold!!", stockDifference.Count);
-            Trace.TraceInformation("Time to notify: {0}", DateTime.Now);
-            
-            string body = ConstructEmailContent(stockDifference);
-            Trace.TraceInformation("Content: {0}", body);
-
-            try
-            {
-                EmailManager.SendEmail(body, concatenatedRecepients, true);
-            }
-            catch (Exception exception)
-            {
-                Trace.TraceError("Ran into exception while sending email! Error: {0}", exception);
-            }
-            
-        }
+        #endregion
     }
 }
