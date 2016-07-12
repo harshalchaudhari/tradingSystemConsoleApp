@@ -60,6 +60,10 @@ namespace StockMarket
                 {
                     Notify(interestingStocks, Recepients);
                 }
+                else
+                {
+                    Trace.TraceInformation("No Interesting Stocks found \n");
+                }
 
                 if (cachedValues.Count >= MaximumCachedValues)
                 {

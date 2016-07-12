@@ -1,0 +1,39 @@
+﻿Goal: 
+Have an automated way to get notified about hot stocks!
+
+
+Long term design (Ideal design):
+
+
+Modules:
+        1. System to get real-time stock data (abstracts the APIs and implementation details)
+        2. Evaluator to evaluate various criteria, given the history of recent stock data, to get interesting stocks
+        3. Reliable system to get notifications
+        
+1. System for getting real-time stock data
+        Ideally, this system will call the APIs at pre-defined intervals and write the data in persistent data store.
+
+
+2. Evaluator
+        Ideally, this will pull the data of interest from data store and compute which stocks look attractive.
+        It will construct the message and push it into the notification system message queue for delivery.
+                
+3. Reliable system to get notifications
+        Given the content, receipients, and notification modes, this system will notify each receipient.
+                
+
+
+Short term:                
+
+
+Current Status:
+        Starting small, what we are doing in short term is:
+        1. (Done) Store ticker symbols of interest in a file (.csv currently!)
+        2. (Done) Load these symbols and concatenate them appropriately (limiting the URL string length) to maximize number of quotes we can get in a single API call!
+        3. (Done) Implement Yahoo APIs to get quotes
+        4. (TODO) Maintain an in memory Queue of last n quote snapshots. Make an API call and get all the quotes. Process and compare what we got with the oldest member in the queue. If that exceeds our threshold, notify! Pop out oldest member and push new result to the queue.
+
+
+        This application will keep running on Harshal's machine. So, once we have a running prototype, we have to quickly get this out of his machine on something more robust and stable.
+        Also, if we are going to use Node.js, Dynamo and all the AWS services, we must come up with how we would fit our system in that ecosystem and work towards that!
+        I have very little knowledge in this ecosystem, but I am all up for learning new things :)
